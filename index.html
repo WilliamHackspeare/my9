@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>My 9 Maker</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&family=Josefin+Sans:wght@400;700&family=VT323&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&family=Josefin+Sans:wght@400;700&family=VT323&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Archivo+Black&family=Archivo:wght@400;500;600;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@500;700&family=Monoton&family=Press+Start+2P&display=swap">
 <style>
 /* Layout: editor column (settings + nine slots) beside a sticky live poster preview; stacks on phones. */
 :root{
@@ -24,12 +24,13 @@ h2{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--mute
 label.f{display:grid;gap:4px;font-size:12px;color:var(--muted);min-width:0}
 input[type=text],select{width:100%;font:inherit;font-size:14px;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
 input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,.thumb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.themes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-@media (max-width:520px){.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .themes button{font:inherit;text-align:left;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:6px;padding:0;cursor:pointer;overflow:hidden}
 .themes button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .themes .sw{height:38px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.themes .nm{display:block;padding:6px 8px;font-size:12px;font-weight:500}
+.themes .nm{display:block;padding:6px 8px 0;font-size:12px;font-weight:500}
+.themes .su{display:block;padding:0 8px 6px;font-size:11px;color:var(--muted)}
+.panel .xsel[hidden]{display:none}
 .chk{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:10px}
 .slots{display:grid;gap:8px}
 .slot{display:grid;grid-template-columns:28px 64px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--field)}
@@ -77,7 +78,7 @@ canvas{display:block;width:100%;height:auto;max-width:100%}
 </head><body>
 <header class="top">
   <h1>My 9 Maker</h1>
-  <p>Pick nine books, albums, games, or films. Type a title and press Enter to find its cover, choose a style, and save the grid as a PNG.</p>
+  <p>Pick nine books, albums, games, films, or shows. Type a title and press Enter to find its cover, choose a style, and save the grid as a PNG.</p>
 </header>
 
 <div class="wrap">
@@ -88,7 +89,7 @@ canvas{display:block;width:100%;height:auto;max-width:100%}
         <label class="f">Category
           <select id="cat">
             <option value="books">Books</option><option value="albums">Albums</option>
-            <option value="games">Games</option><option value="films">Films</option><option value="custom">Something else</option>
+            <option value="games">Games</option><option value="films">Films</option><option value="tv">TV shows</option><option value="custom">Something else</option>
           </select>
         </label>
         <label class="f" id="nounWrap" hidden>Plural noun<input type="text" id="noun" placeholder="Podcasts"></label>
@@ -110,7 +111,7 @@ canvas{display:block;width:100%;height:auto;max-width:100%}
       <h2>The nine</h2>
       <p class="note" id="exampleNote" hidden>This is an example list. Replace the covers and titles with your own, or use Clear all to start from blank slots.</p>
       <div class="slots" id="slots"></div>
-      <p class="hint">Type a title and press Enter (or use Search) to look up covers: books come from Open Library, albums from Apple Music, and games, films, and everything else from Wikipedia. For books, "Other editions" shows more covers. You can also click the box to upload your own image, drop one on a row, or paste one while that row is selected.</p>
+      <p class="hint">Type a title and press Enter (or use Search) to look up covers. Each category starts with the best source for it, and the source menu has more: Open Library, Apple Music (with a choice of country store), MusicBrainz, Steam, TVmaze, Wikipedia in 14 languages, or a pasted image link. For books, "Other editions" shows more covers. You can also click the box to upload your own image, drop one on a row, or paste one while that row is selected.</p>
       <div class="bar" style="margin-top:10px"><button class="ib" id="clear">Clear all</button></div>
     </section>
   </div>
@@ -136,6 +137,7 @@ const CATS = {
   albums: {noun:'Albums', sub:'Artist',   aspect:1,   kicker:'A personal record shelf',   prompt:'C:\\MUSIC> dir /s *.mp3',   foot:'Side A to side B',       find:' album cover'},
   games:  {noun:'Games',  sub:'Studio',   aspect:4/3, kicker:'A personal save file',      prompt:'C:\\GAMES> dir /s *.exe',   foot:'Press start',            find:' game cover art'},
   films:  {noun:'Films',  sub:'Director', aspect:3/2, kicker:'A personal screening list',  prompt:'C:\\FILMS> dir /s *.avi',   foot:'Now showing',            find:' film poster'},
+  tv:     {noun:'Shows',  sub:'Network',  aspect:3/2, kicker:'A personal watchlist',       prompt:'C:\\TV> dir /s *.mkv',      foot:'Previously on',          find:' tv series poster'},
   custom: {noun:'Things', sub:'Subtitle', aspect:4/3, kicker:'A personal list',           prompt:'C:\\> dir /s',              foot:'The full set',           find:' cover'},
 };
 const EXAMPLE = [
@@ -150,7 +152,7 @@ const EXAMPLE = [
   ['https://covers.openlibrary.org/b/id/14612610-L.jpg','Foundation','Isaac Asimov'],
 ];
 const blankItems = () => Array.from({length:9}, () => ({src:'', title:'', sub:''}));
-const defaults = () => ({cat:'books', noun:'', heading:'', subtitle:'', hashtag:'', theme:'catalogue', nums:true, example:true,
+const defaults = () => ({cat:'books', noun:'', heading:'', subtitle:'', hashtag:'', theme:'catalogue', nums:true, example:true, country:'us', wlang:'en',
   items: EXAMPLE.map(([src,title,sub]) => ({src,title,sub}))});
 
 let st = defaults();
@@ -167,7 +169,9 @@ const imgCache = new Map();
 function getImg(src){
   if (!src) return null;
   let e = imgCache.get(src);
-  if (!e) { const im = new Image(); if (/^https?:/.test(src)) im.crossOrigin = 'anonymous'; e = {im, ok:false}; im.onload = () => { e.ok = true; schedule(); }; im.src = src; imgCache.set(src, e); }
+  if (!e) { const im = new Image(); if (/^https?:/.test(src)) im.crossOrigin = 'anonymous'; e = {im, ok:false}; im.onload = () => { e.ok = true; schedule(); };
+    im.onerror = () => { if (/coverartarchive\.org\/.*front-1200$/.test(src) && !e.retried) { e.retried = true; im.src = src.replace('front-1200','front-500'); } };
+    im.src = src; imgCache.set(src, e); }
   return e.ok ? e.im : null;
 }
 function fileToSrc(file){
@@ -180,6 +184,23 @@ function fileToSrc(file){
       im.onerror = () => rej(new Error('That file could not be read as an image.')); im.src = r.result; };
     r.onerror = () => rej(new Error('That file could not be read.')); r.readAsDataURL(file);
   });
+}
+
+const filtCache = new Map();
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+function filtered(im, key){
+  let c = filtCache.get(key); if (c) return c;
+  const w = 168, h = Math.max(1, Math.round(im.height * w / im.width));
+  c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+  g.drawImage(im, 0, 0, w, h); const d = g.getImageData(0, 0, w, h), px = d.data;
+  const pal = [[15,56,15],[48,98,48],[139,172,15],[155,188,15]];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y*w + x)*4; let l = (0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2]) / 255;
+    l = Math.min(1, Math.max(0, (l - 0.5) * 1.15 + 0.5));
+    const v = l*3 + (BAYER[(y%4)*4 + (x%4)]/16 - 0.5) * 0.9; const k = Math.max(0, Math.min(3, Math.round(v)));
+    px[i] = pal[k][0]; px[i+1] = pal[k][1]; px[i+2] = pal[k][2]; px[i+3] = 255;
+  }
+  g.putImageData(d, 0, 0); filtCache.set(key, c); return c;
 }
 
 /* ---------- canvas helpers ---------- */
@@ -223,7 +244,7 @@ function cover(ctx, im, x, y, w, h, align, sh, empty){
 /* Each theme: header(ctx,measureOnly)->height, grid metrics, card(ctx,...), caption style, footer. */
 const THEMES = {
   catalogue: {
-    name:'Catalogue card', swatch:['#3b2618','#f4ecd8','Aa','Special Elite'],
+    name:'Catalogue card', suits:'Books', swatch:['#3b2618','#f4ecd8','Aa','Special Elite'],
     padX:48, gapX:28, gapY:30, top:52, bottom:44, cardPad:16, framePad:10, align:'center',
     cap:{gap:14, padTop:12, padBot:14, numW:34, title:'700 16px "Courier Prime"', titleLH:20, sub:'400 13px "Courier Prime"', subLH:17, subGap:4, center:false, upper:false},
     bg(ctx,H){ const g = ctx.createRadialGradient(W/2,0,0,W/2,0,W*0.9); g.addColorStop(0,'#5a3a24'); g.addColorStop(1,'#3b2618');
@@ -249,7 +270,7 @@ const THEMES = {
     footer(ctx,y,o){ if (ctx){ ctx.fillStyle = '#f4ecd8'; font(ctx,'400 20px "Special Elite"'); spaced(ctx,o.hashtag,W/2,y+36+18,3,'center'); } return y + 36 + 26; },
   },
   nightsky: {
-    name:'Night sky', swatch:['#070b1a','#e8c27a','Aa','Cormorant Garamond'],
+    name:'Night sky', suits:'Books, albums', swatch:['#070b1a','#e8c27a','Aa','Cormorant Garamond'],
     padX:48, gapX:34, gapY:40, top:60, bottom:48, cardPad:0, framePad:18, align:'center',
     cap:{gap:6, padTop:0, padBot:0, numW:0, title:'600 24px "Cormorant Garamond"', titleLH:27, sub:'400 12px Jost', subLH:16, subGap:6, center:true, upper:true, numAbove:22},
     bg(ctx,H){ ctx.fillStyle = '#070b1a'; ctx.fillRect(0,0,W,H);
@@ -274,7 +295,7 @@ const THEMES = {
     footer(ctx,y,o){ if (ctx){ ctx.fillStyle = '#e8c27a'; font(ctx,'500 13px Jost'); spaced(ctx,o.hashtag.toUpperCase(),W/2,y+44+13,6,'center'); } return y + 44 + 18; },
   },
   paperback: {
-    name:'Paperback', swatch:['#e5682a','#f6f0e2','AA','Josefin Sans'],
+    name:'Paperback', suits:'Books', swatch:['#e5682a','#f6f0e2','AA','Josefin Sans'],
     padX:48, gapX:30, gapY:36, top:0, bottom:40, cardPad:0, framePad:0, frameSide:14, align:'bottom',
     cap:{gap:14, padTop:0, padBot:0, numW:40, title:'700 19px "Josefin Sans"', titleLH:23, sub:'400 15px "Josefin Sans"', subLH:19, subGap:5, center:false, upper:true},
     bg(ctx,H){ ctx.fillStyle = '#f6f0e2'; ctx.fillRect(0,0,W,H); },
@@ -297,7 +318,7 @@ const THEMES = {
       spaced(ctx,o.hashtag.toUpperCase(),48,y+40+30,4,'left'); spaced(ctx,o.foot.toUpperCase(),W-48,y+40+30,4,'right'); } return y + 40 + 34; },
   },
   terminal: {
-    name:'Terminal', swatch:['#0d1110','#ffb000','My9','VT323'],
+    name:'Terminal', suits:'Games', swatch:['#0d1110','#ffb000','My9','VT323'],
     padX:40, gapX:20, gapY:20, top:40, bottom:36, cardPad:0, framePad:22, align:'center',
     cap:{gap:0, padTop:14, padBot:14, numW:30, title:'600 14px "IBM Plex Mono"', titleLH:18, sub:'500 12px "IBM Plex Mono"', subLH:16, subGap:3, center:false, upper:false, padX:16},
     bg(ctx,H){ ctx.fillStyle = '#0d1110'; ctx.fillRect(0,0,W,H); ctx.fillStyle = 'rgba(255,255,255,.018)'; for (let y=0;y<H;y+=3) ctx.fillRect(0,y,W,1);
@@ -326,6 +347,125 @@ const THEMES = {
         ctx.fillStyle = '#ffb000'; ctx.textAlign='center'; ctx.fillText(o.hashtag, W/2, py+25); }
       return y + 30 + 38; },
   },
+  vinyl: {
+    name:'Record crate', suits:'Albums', swatch:['#ece4d4','#d23c2a','Aa','Archivo Black'],
+    padX:48, gapX:30, gapY:34, top:52, bottom:44, cardPad:0, framePad:0, aspect:0.8, align:'center',
+    cap:{gap:16, padTop:0, padBot:0, numW:42, title:'700 16px "Space Mono"', titleLH:20, sub:'400 13px "Space Mono"', subLH:17, subGap:4, center:false, upper:false},
+    bg(ctx,H){ ctx.fillStyle = '#ece4d4'; ctx.fillRect(0,0,W,H); ctx.fillStyle = 'rgba(0,0,0,.025)'; for (let x=0;x<W;x+=6) ctx.fillRect(x,0,2,H); },
+    header(ctx,o){ const y = this.top; if (!ctx) return y + 182 + 38;
+      ctx.save(); ctx.translate(W/2, y+14); ctx.rotate(-2*Math.PI/180); font(ctx,'700 14px "Space Mono"');
+      const k = o.kicker.toUpperCase(); const kw = [...k].reduce((a,c)=>a+ctx.measureText(c).width+3,-3) + 28;
+      ctx.fillStyle = '#d23c2a'; ctx.fillRect(-kw/2,-14,kw,28); ctx.fillStyle = '#fff'; spaced(ctx,k,0,5,3,'center'); ctx.restore();
+      ctx.fillStyle = '#231f1a'; font(ctx,'400 104px "Archivo Black"'); const t = o.heading;
+      const tw = [...t].reduce((a,c)=>a+ctx.measureText(c).width-3,3); const sc = Math.min(1,(W-96)/tw);
+      ctx.save(); ctx.translate(W/2, y+130); ctx.scale(sc,sc); spaced(ctx,t,0,0,-3,'center'); ctx.restore();
+      ctx.fillStyle = '#7a7062'; font(ctx,'400 15px "Space Mono"'); spaced(ctx, fit(ctx,o.subtitle.toUpperCase(),W-260), W/2, y+168, 4, 'center');
+      return y + 182 + 38; },
+    coverBox(fr){ return {x:fr.x, y:fr.y, w:fr.h, h:fr.h}; },
+    card(ctx,x,y,w,h,fr){ const R = fr.h*0.47, cx0 = fr.x + fr.h*0.70, cy0 = fr.y + fr.h/2;
+      ctx.save(); shadow(ctx,14,6,'rgba(0,0,0,.25)'); ctx.beginPath(); ctx.arc(cx0,cy0,R,0,7); ctx.fillStyle = '#141210'; ctx.fill(); noShadow(ctx);
+      ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 1; for (let r = R*0.35; r < R*0.97; r += 4) { ctx.beginPath(); ctx.arc(cx0,cy0,r,0,7); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(cx0,cy0,R*0.3,0,7); ctx.fillStyle = '#d23c2a'; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx0,cy0,R*0.04,0,7); ctx.fillStyle = '#ece4d4'; ctx.fill(); ctx.restore(); },
+    coverShadow(ctx){ shadow(ctx,16,8,'rgba(0,0,0,.35)'); },
+    empty:{stroke:'#b9ae9b', fg:'#7a7062', font:'400 13px "Space Mono"'},
+    num(ctx,i,x,y){ ctx.fillStyle = '#d23c2a'; font(ctx,'400 28px "Archivo Black"'); ctx.textAlign='left'; ctx.fillText(String(i+1), x, y+24); },
+    titleColor:'#231f1a', subColor:'#7a7062',
+    footer(ctx,y,o){ if (ctx){ ctx.fillStyle = '#231f1a'; font(ctx,'700 14px "Space Mono"'); spaced(ctx,o.hashtag.toUpperCase(),W/2,y+40+14,4,'center'); } return y + 40 + 20; },
+  },
+  postcard: {
+    name:'Postcard', suits:'Albums, films', swatch:['#f3ead8','#c4532d','Aa','Fraunces'],
+    padX:48, gapX:26, gapY:30, top:56, bottom:44, cardPad:12, framePad:0, align:'center',
+    tilt(i){ return [-1.1,0,1][i%3]; },
+    cap:{gap:12, padTop:0, padBot:14, numW:36, title:'600 19px Fraunces', titleLH:23, sub:'500 12px "DM Sans"', subLH:16, subGap:5, center:false, upper:false, subUpper:true, padX:4},
+    subLS:2,
+    bg(ctx,H){ ctx.fillStyle = '#f3ead8'; ctx.fillRect(0,0,W,H);
+      let g = ctx.createRadialGradient(W*0.85,H*0.06,0,W*0.85,H*0.06,W*0.4); g.addColorStop(0,'rgba(196,83,45,.16)'); g.addColorStop(1,'rgba(196,83,45,0)'); ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      g = ctx.createRadialGradient(W*0.1,H,0,W*0.1,H,W*0.55); g.addColorStop(0,'rgba(31,95,168,.12)'); g.addColorStop(1,'rgba(31,95,168,0)'); ctx.fillStyle = g; ctx.fillRect(0,0,W,H); },
+    header(ctx,o){ const y = this.top; if (!ctx) return y + 196 + 36;
+      const words = o.heading.split(' '); const last = words.length > 1 ? words.pop() : ''; const first = words.join(' ');
+      ctx.fillStyle = '#1f2a44'; font(ctx,'800 92px Fraunces'); ctx.textAlign = 'left'; ctx.fillText(fit(ctx,first,W-420), 48, y+80);
+      ctx.fillStyle = '#c4532d'; font(ctx,'italic 400 92px Fraunces'); ctx.fillText(fit(ctx,last,W-420), 48, y+170);
+      ctx.fillStyle = '#6b6457'; font(ctx,'500 14px "DM Sans"'); spaced(ctx, o.kicker.toUpperCase(), W-48, y+150, 3, 'right');
+      ctx.fillStyle = '#1f5fa8'; font(ctx,'700 14px "DM Sans"'); spaced(ctx, o.hashtag.toUpperCase(), W-48, y+175, 3, 'right');
+      ctx.fillStyle = '#1f2a44'; ctx.fillRect(48, y+194, W-96, 2); return y + 196 + 36; },
+    card(ctx,x,y,w,h,fr){ ctx.save(); shadow(ctx,24,12,'rgba(31,42,68,.30)'); ctx.fillStyle = '#fffaf0'; ctx.fillRect(x,y,w,h); ctx.restore(); },
+    coverShadow(ctx){ },
+    empty:{stroke:'#c9bfae', fg:'#6b6457', font:'500 13px "DM Sans"'},
+    num(ctx,i,x,y){ ctx.fillStyle = '#c4532d'; font(ctx,'italic 400 30px Fraunces'); ctx.textAlign='left'; ctx.fillText(String(i+1), x, y+22); },
+    titleColor:'#1f2a44', subColor:'#6b6457',
+    footer(ctx,y,o){ if (ctx){ ctx.fillStyle = '#6b6457'; font(ctx,'500 13px "DM Sans"'); spaced(ctx,o.subtitle.toUpperCase(),48,y+38+13,3,'left'); spaced(ctx,o.foot.toUpperCase(),W-48,y+38+13,3,'right'); } return y + 38 + 18; },
+  },
+  arcade: {
+    name:'Arcade', suits:'Games', swatch:['#14062b','#ff3ea5','9','Monoton'],
+    padX:48, gapX:26, gapY:30, top:46, bottom:46, cardPad:0, framePad:16, align:'center',
+    cap:{gap:0, padTop:14, padBot:16, numW:40, title:'400 11px "Press Start 2P"', titleLH:17, sub:'400 19px VT323', subLH:18, subGap:5, center:false, upper:true, padX:14},
+    bg(ctx,H){ const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#14062b'); g.addColorStop(0.35,'#0b0420'); g.addColorStop(1,'#07021a'); ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      const r = rng(4); ctx.fillStyle = '#fff'; for (let i=0;i<120;i++){ ctx.globalAlpha = .15 + r()*.5; ctx.fillRect(Math.round(r()*W), Math.round(r()*H), 2, 2); } ctx.globalAlpha = 1; },
+    header(ctx,o){ const y = this.top, hz = y + 214; if (!ctx) return hz + 70;
+      const sx = W/2, sy = y + 112, R = 82;
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,hz); ctx.clip();
+      const sg = ctx.createLinearGradient(0,sy-R,0,sy+R); sg.addColorStop(0,'#ffe14d'); sg.addColorStop(0.55,'#ff7a3d'); sg.addColorStop(1,'#ff3ea5');
+      ctx.beginPath(); ctx.arc(sx,sy,R,0,7); ctx.fillStyle = sg; shadow(ctx,60,0,'rgba(255,62,165,.6)'); ctx.fill(); noShadow(ctx);
+      ctx.fillStyle = '#0b0420'; for (let k=0;k<7;k++){ const yy = sy + 8 + k*11; ctx.fillRect(sx-R, yy, 2*R, 2 + k*1.1); }
+      ctx.restore();
+      ctx.save(); ctx.strokeStyle = 'rgba(255,62,165,.75)'; ctx.lineWidth = 1.5; shadow(ctx,8,0,'rgba(255,62,165,.9)');
+      ctx.beginPath(); ctx.moveTo(0,hz); ctx.lineTo(W,hz); ctx.stroke();
+      for (let k=1;k<6;k++){ const yy = hz + Math.pow(k/5,1.8)*60; ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke(); }
+      for (let k=-12;k<=12;k++){ ctx.beginPath(); ctx.moveTo(W/2 + k*30, hz); ctx.lineTo(W/2 + k*150, hz+60); ctx.stroke(); }
+      ctx.restore();
+      ctx.save(); font(ctx,'400 84px Monoton'); const sc = Math.min(1,(W-80)/ctx.measureText(o.heading).width);
+      ctx.translate(W/2, y+150); ctx.scale(sc,sc); ctx.textAlign = 'center'; shadow(ctx,24,0,'rgba(41,231,255,.9)'); ctx.fillStyle = '#e9fbff'; ctx.fillText(o.heading,0,0);
+      noShadow(ctx); ctx.restore();
+      ctx.fillStyle = '#29e7ff'; font(ctx,'400 12px "Press Start 2P"'); ctx.textAlign='center'; ctx.fillText(fit(ctx,o.subtitle.toUpperCase(),W-120), W/2, y+198);
+      ctx.fillStyle = '#ffe14d'; font(ctx,'400 11px "Press Start 2P"'); ctx.fillText(o.kicker.toUpperCase(), W/2, y+14);
+      return hz + 70; },
+    card(ctx,x,y,w,h,fr){ ctx.save(); rrect(ctx,x,y,w,h,8); ctx.fillStyle = 'rgba(22,10,48,.92)'; ctx.fill();
+      shadow(ctx,14,0,'rgba(41,231,255,.75)'); ctx.strokeStyle = '#29e7ff'; ctx.lineWidth = 2; ctx.stroke(); noShadow(ctx);
+      ctx.fillStyle = '#ff3ea5'; ctx.fillRect(x+14, fr.y+fr.h, w-28, 2); ctx.restore(); },
+    coverShadow(ctx){ shadow(ctx,18,0,'rgba(255,62,165,.45)'); },
+    empty:{stroke:'#4b3a7a', fg:'#b9a6ff', font:'400 18px VT323'},
+    num(ctx,i,x,y){ ctx.fillStyle = '#ffe14d'; font(ctx,'400 16px "Press Start 2P"'); ctx.textAlign='left'; ctx.fillText(String(i+1).padStart(2,'0'), x, y+17); },
+    titleColor:'#ffffff', subColor:'#b9a6ff',
+    footer(ctx,y,o){ if (ctx){ ctx.save(); ctx.fillStyle = '#ff3ea5'; shadow(ctx,14,0,'rgba(255,62,165,.9)'); font(ctx,'400 14px "Press Start 2P"'); ctx.textAlign='center'; ctx.fillText(o.hashtag.toUpperCase(), W/2, y+44+14); ctx.restore(); } return y + 44 + 18; },
+  },
+  handheld: {
+    name:'Handheld', suits:'Games', swatch:['#8bac0f','#0f380f','GB','Press Start 2P'],
+    padX:48, gapX:24, gapY:26, top:56, bottom:48, cardPad:12, framePad:0, align:'center', pixel:true,
+    cap:{gap:12, padTop:0, padBot:14, numW:36, title:'400 10px "Press Start 2P"', titleLH:16, sub:'400 8px "Press Start 2P"', subLH:13, subGap:6, center:false, upper:true, padX:2},
+    bg(ctx,H){ ctx.fillStyle = '#8bac0f'; ctx.fillRect(0,0,W,H); ctx.fillStyle = 'rgba(15,56,15,.06)'; for (let x=0;x<W;x+=4) ctx.fillRect(x,0,1,H); for (let y=0;y<H;y+=4) ctx.fillRect(0,y,W,1); },
+    header(ctx,o){ const y = this.top; if (!ctx) return y + 128 + 30;
+      ctx.fillStyle = '#306230'; font(ctx,'400 12px "Press Start 2P"'); ctx.textAlign='center'; ctx.fillText(o.kicker.toUpperCase(), W/2, y+12);
+      font(ctx,'400 56px "Press Start 2P"'); const sc = Math.min(1,(W-100)/ctx.measureText(o.heading).width);
+      ctx.save(); ctx.translate(W/2, y+86); ctx.scale(sc,sc); ctx.fillStyle = '#306230'; ctx.fillText(o.heading, 5, 5); ctx.fillStyle = '#0f380f'; ctx.fillText(o.heading, 0, 0); ctx.restore();
+      ctx.fillStyle = '#306230'; font(ctx,'400 12px "Press Start 2P"'); ctx.fillText(fit(ctx,o.subtitle.toUpperCase(),W-120), W/2, y+124);
+      return y + 128 + 30; },
+    card(ctx,x,y,w,h,fr){ ctx.fillStyle = '#0f380f'; ctx.fillRect(x+4,y,w-8,h); ctx.fillRect(x,y+4,w,h-8);
+      ctx.fillStyle = '#9bbc0f'; ctx.fillRect(x+8,y+4,w-16,h-8); ctx.fillRect(x+4,y+8,w-8,h-16); },
+    coverShadow(ctx){ },
+    filter: 'gameboy',
+    empty:{stroke:'#306230', fg:'#306230', font:'400 9px "Press Start 2P"'},
+    num(ctx,i,x,y){ ctx.fillStyle = '#0f380f'; font(ctx,'400 16px "Press Start 2P"'); ctx.textAlign='left'; ctx.fillText(String(i+1), x, y+17); },
+    titleColor:'#0f380f', subColor:'#306230',
+    footer(ctx,y,o){ if (ctx){ ctx.fillStyle = '#0f380f'; font(ctx,'400 14px "Press Start 2P"'); ctx.textAlign='center'; ctx.fillText(o.hashtag.toUpperCase(), W/2, y+40+14); } return y + 40 + 18; },
+  },
+  clean: {
+    name:'Clean', suits:'Anything', swatch:['#fafaf7','#111111','Aa','Archivo'],
+    padX:56, gapX:32, gapY:40, top:64, bottom:52, cardPad:0, framePad:0, align:'bottom',
+    cap:{gap:14, padTop:0, padBot:0, numW:30, title:'600 15px Archivo', titleLH:19, sub:'400 13px Archivo', subLH:17, subGap:3, center:false, upper:false},
+    bg(ctx,H){ ctx.fillStyle = '#fafaf7'; ctx.fillRect(0,0,W,H); },
+    header(ctx,o){ const y = this.top; if (!ctx) return y + 108 + 44;
+      ctx.fillStyle = '#111'; font(ctx,'800 64px Archivo'); ctx.textAlign='left'; spaced(ctx, fit(ctx,o.heading,W-420), 56, y+56, -1.5);
+      ctx.fillStyle = '#6d6d68'; font(ctx,'400 18px Archivo'); ctx.fillText(fit(ctx,o.subtitle,W-420), 56, y+92);
+      font(ctx,'500 14px Archivo'); ctx.textAlign='right'; ctx.fillText(o.hashtag, W-56, y+92);
+      ctx.fillStyle = '#111'; ctx.fillRect(56, y+108, W-112, 1.5); return y + 108 + 44; },
+    card(){},
+    coverShadow(ctx){ shadow(ctx,10,4,'rgba(0,0,0,.12)'); },
+    empty:{stroke:'#cfcfc9', fg:'#8a8a84', font:'400 13px Archivo'},
+    num(ctx,i,x,y){ ctx.fillStyle = '#8a8a84'; font(ctx,'500 13px Archivo'); ctx.textAlign='left'; ctx.fillText(String(i+1).padStart(2,'0'), x, y+14); },
+    titleColor:'#111', subColor:'#6d6d68',
+    footer(ctx,y,o){ return y + 8; },
+  },
 };
 function fit(ctx, text, maxW){ if (ctx.measureText(text).width <= maxW) return text; let s = text; while (s.length > 1 && ctx.measureText(s+'…').width > maxW) s = s.slice(0,-1); return s + '…'; }
 
@@ -337,13 +477,13 @@ function render(){
   const m = document.createElement('canvas').getContext('2d');
   const cardW = (W - 2*T.padX - 2*T.gapX) / 3;
   const side = T.frameSide ?? 0;
-  const frW = cardW - 2*T.cardPad, frH = frW * cat.aspect;
+  const frW = cardW - 2*T.cardPad, frH = frW * (T.aspect ?? cat.aspect);
   const capX = C.padX ?? (T.cardPad ? 4 : 0);
   const textW = cardW - 2*T.cardPad - 2*capX - (st.nums ? C.numW : 0) - (C.center ? 0 : 0);
   // measure captions
   const caps = st.items.map(it => {
     m.font = C.title; const tl = wrap(m, C.upper && !C.center ? it.title.toUpperCase() : it.title, C.center ? cardW-8 : textW, 3);
-    m.font = C.sub; const sl = it.sub ? wrap(m, C.upper ? it.sub.toUpperCase() : it.sub, C.center ? cardW-8 : textW, 2) : [];
+    m.font = C.sub; const sl = it.sub ? wrap(m, (C.upper || C.subUpper) ? it.sub.toUpperCase() : it.sub, C.center ? cardW-8 : textW - (T.subLS ? 30 : 0), 2) : [];
     return {tl, sl};
   });
   const capH = Math.max(...caps.map(c => (c.tl.length||1)*C.titleLH + (c.sl.length ? C.subGap + c.sl.length*C.subLH : 0))) + (C.center && st.nums ? C.numAbove : 0);
@@ -358,9 +498,17 @@ function render(){
     const col = i % 3, row = Math.floor(i/3);
     const x = T.padX + col*(cardW + T.gapX), y = gridTop + row*(cardH + T.gapY);
     const fr = {x: x+T.cardPad, y: y+T.cardPad, w: frW, h: frH};
+    cx.save();
+    const tilt = T.tilt ? T.tilt(i) : 0;
+    if (tilt) { cx.translate(x+cardW/2, y+cardH/2); cx.rotate(tilt*Math.PI/180); cx.translate(-(x+cardW/2), -(y+cardH/2)); }
     T.card(cx, x, y, cardW, cardH, fr);
     const p = T.framePad;
-    cover(cx, getImg(it.src), fr.x+p+side, fr.y+p, fr.w-2*p-2*side, fr.h-2*p, T.align, () => T.coverShadow(cx), T.empty);
+    const cb = T.coverBox ? T.coverBox(fr) : {x:fr.x+p+side, y:fr.y+p, w:fr.w-2*p-2*side, h:fr.h-2*p};
+    let im = getImg(it.src);
+    if (im && T.filter) { try { im = filtered(im, T.filter + '|' + it.src); } catch { } }
+    cx.imageSmoothingEnabled = !T.pixel;
+    cover(cx, im, cb.x, cb.y, cb.w, cb.h, T.align, () => T.coverShadow(cx), T.empty);
+    cx.imageSmoothingEnabled = true;
     let ty = fr.y + fr.h + (T.capOffset||0) + C.gap + C.padTop;
     const c = caps[i];
     if (C.center) {
@@ -376,8 +524,9 @@ function render(){
       cx.fillStyle = it.title ? T.titleColor : T.subColor; cx.font = C.title; cx.textAlign = 'left';
       (c.tl.length ? c.tl : ['Untitled']).forEach((l,k) => cx.fillText(l, tx, ty + C.titleLH*(k+1) - 5));
       ty += (c.tl.length||1)*C.titleLH + C.subGap; cx.fillStyle = T.subColor; cx.font = C.sub;
-      c.sl.forEach((l,k) => cx.fillText(l, tx, ty + C.subLH*(k+1) - 4));
+      c.sl.forEach((l,k) => spaced(cx, l, tx, ty + C.subLH*(k+1) - 4, T.subLS||0, 'left'));
     }
+    cx.restore();
   });
   T.footer(cx, gridBot, o);
 }
@@ -400,8 +549,8 @@ function syncSettings(){
 }
 Object.entries(THEMES).forEach(([k,t]) => {
   const b = document.createElement('button'); b.type = 'button'; b.dataset.k = k;
-  b.innerHTML = `<span class="sw" style="background:${t.swatch[0]};color:${t.swatch[1]};font-family:'${t.swatch[3]}'">${t.swatch[2]}</span><span class="nm"></span>`;
-  b.querySelector('.nm').textContent = t.name;
+  b.innerHTML = `<span class="sw" style="background:${t.swatch[0]};color:${t.swatch[1]};font-family:'${t.swatch[3]}'">${t.swatch[2]}</span><span class="nm"></span><span class="su"></span>`;
+  b.querySelector('.nm').textContent = t.name; b.querySelector('.su').textContent = 'Suits ' + t.suits.toLowerCase();
   b.onclick = () => { st.theme = k; syncSettings(); changed(); };
   $('themes').appendChild(b);
 });
@@ -415,27 +564,72 @@ async function setImage(i, file){
   catch (err) { $('status').textContent = err.message; }
 }
 /* ---------- cover search ---------- */
-const SOURCES = {openlibrary:'Open Library', itunes:'Apple Music', wikipedia:'Wikipedia'};
-const autoSource = () => ({books:'openlibrary', albums:'itunes'})[st.cat] || 'wikipedia';
+const SOURCES = {
+  openlibrary:'Open Library (books)', itunes_album:'Apple Music (albums)', musicbrainz:'MusicBrainz (albums)',
+  steam:'Steam (PC games)', tvmaze:'TVmaze (TV shows)', wikipedia:'Wikipedia', url:'Image link',
+};
+const COUNTRIES = {us:'US store', gb:'UK store', in:'India store', it:'Italy store', es:'Spain store', fr:'France store', de:'Germany store', gr:'Greece store', pt:'Portugal store', br:'Brazil store', mx:'Mexico store', jp:'Japan store', kr:'Korea store', au:'Australia store', ca:'Canada store'};
+const LANGS = {en:'English', es:'Español', it:'Italiano', fr:'Français', de:'Deutsch', pt:'Português', el:'Ελληνικά', ja:'日本語', ko:'한국어', hi:'हिन्दी', ru:'Русский', pl:'Polski', nl:'Nederlands', sv:'Svenska'};
+const autoSource = () => ({books:'openlibrary', albums:'itunes_album', games:'wikipedia', films:'wikipedia', tv:'tvmaze'})[st.cat] || 'wikipedia';
 const qs = o => new URLSearchParams(o).toString();
-async function getJSON(url){ const r = await fetch(url); if (!r.ok) throw new Error(`The search service answered ${r.status}.`); return r.json(); }
-async function searchCovers(src, q){
+async function getJSON(url){ const r = await fetch(url); if (!r.ok) throw new Error(`the search service answered ${r.status}`); return r.json(); }
+const big = u => u.replace(/\/\d+x\d+bb\./, '/1000x1000bb.');
+async function searchCovers(src, q, opt){
   if (src === 'openlibrary') {
     const d = await getJSON('https://openlibrary.org/search.json?' + qs({q, fields:'key,title,author_name,cover_i,first_publish_year', limit:'24'}));
     return d.docs.filter(x => x.cover_i).slice(0,12).map(x => ({thumb:`https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg`, full:`https://covers.openlibrary.org/b/id/${x.cover_i}-L.jpg`,
       title:x.title, sub:(x.author_name||[]).slice(0,2).join(' & '), meta:x.first_publish_year ? String(x.first_publish_year) : '', key:x.key}));
   }
-  if (src === 'itunes') {
-    const d = await getJSON('https://itunes.apple.com/search?' + qs({term:q, entity:'album', limit:'12'}));
-    return d.results.filter(x => x.artworkUrl100).map(x => ({thumb:x.artworkUrl100.replace('100x100bb','300x300bb'), full:x.artworkUrl100.replace('100x100bb','1000x1000bb'),
-      title:x.collectionName, sub:x.artistName, meta:(x.releaseDate||'').slice(0,4)}));
+  if (src === 'itunes_album') {
+    const order = [...new Set([opt.country || 'us', 'us', 'gb', 'it', 'es', 'fr', 'de', 'in', 'jp', 'br'])];
+    for (const country of order.slice(0, 7)) {
+      const d = await getJSON('https://itunes.apple.com/search?' + qs({term:q, entity:'album', limit:'15', country}));
+      const list = d.results.filter(x => x.artworkUrl100).slice(0,12).map(x => ({thumb:x.artworkUrl100.replace(/\/100x100bb\./,'/300x300bb.'), full:big(x.artworkUrl100),
+        title:x.collectionName, sub:x.artistName || '', meta:(x.releaseDate||'').slice(0,4)}));
+      if (list.length) { if (country !== (opt.country || 'us')) list.note = `Nothing in the ${COUNTRIES[opt.country] || 'selected store'}, so these come from the ${COUNTRIES[country]}.`; return list; }
+    }
+    return [];
   }
-  const want = ({games:/game/i, films:/film|movie/i, books:/novel|book|non-fiction|play by/i, albums:/album/i})[st.cat];
-  const d = await getJSON('https://en.wikipedia.org/w/api.php?' + qs({action:'query', format:'json', origin:'*', generator:'search', gsrsearch:q, gsrlimit:'20',
+  if (src === 'musicbrainz') {
+    const terms = q.replace(/["():\[\]{}^~*?\\/!+-]/g,' ').split(/\s+/).filter(Boolean);
+    const query = terms.map(t => `(releasegroup:${t} OR artist:${t})`).join(' AND ');
+    const d = await getJSON('https://musicbrainz.org/ws/2/release-group/?' + qs({query, fmt:'json', limit:'24'}));
+    const type = r => r['primary-type'] === 'Album' ? 0 : r['primary-type'] === 'EP' ? 1 : 2;
+    return (d['release-groups']||[]).sort((a,b) => (b.score - a.score) || (type(a) - type(b))).slice(0,15).map(r => ({
+      thumb:`https://coverartarchive.org/release-group/${r.id}/front-250`, full:`https://coverartarchive.org/release-group/${r.id}/front-1200`,
+      title:r.title, sub:(r['artist-credit']||[]).map(a => a.name + (a.joinphrase||'')).join(''), meta:[(r['first-release-date']||'').slice(0,4), r['primary-type']].filter(Boolean).join(' '), hideBroken:true}));
+  }
+  if (src === 'steam') {
+    const s = await getJSON('https://www.wikidata.org/w/api.php?' + qs({action:'query', list:'search', srsearch:q + ' haswbstatement:P1733', srlimit:'12', format:'json', origin:'*'}));
+    const ids = (s.query?.search||[]).map(x => x.title); if (!ids.length) return [];
+    const e = await getJSON('https://www.wikidata.org/w/api.php?' + qs({action:'wbgetentities', ids:ids.join('|'), props:'labels|descriptions|claims', languages:'en|mul', languagefallback:'1', format:'json', origin:'*'}));
+    const out = [];
+    for (const id of ids) { const en = e.entities?.[id]; if (!en) continue;
+      const app = (en.claims?.P1733||[]).map(c => c.mainsnak?.datavalue?.value).find(Boolean); if (!app) continue;
+      const desc = en.descriptions?.en?.value || en.descriptions?.mul?.value || '';
+      const base = `https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/${app}/`;
+      out.push({thumb:base + 'library_600x900.jpg', full:base + 'library_600x900_2x.jpg', alt:base + 'header.jpg',
+        title:en.labels?.en?.value || en.labels?.mul?.value || '', sub:'', meta:desc, mod:/\bmod(ification)?\b/i.test(desc)}); }
+    return out.sort((a,b) => a.mod - b.mod);
+  }
+  if (src === 'tvmaze') {
+    const d = await getJSON('https://api.tvmaze.com/search/shows?' + qs({q}));
+    return d.filter(x => x.show?.image).slice(0,12).map(({show:x}) => ({thumb:x.image.medium, full:x.image.original,
+      title:x.name, sub:x.network?.name || x.webChannel?.name || '', meta:(x.premiered||'').slice(0,4)}));
+  }
+  if (src === 'url') {
+    if (!/^https?:\/\//i.test(q)) throw new Error('paste a full image link starting with https://');
+    await new Promise((res, rej) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = res;
+      im.onerror = () => rej(new Error("that site doesn't let other pages use its images. Save the image and upload it instead")); im.src = q; });
+    return [{thumb:q, full:q, title:'', sub:'', meta:'From link', edition:true}];
+  }
+  const lang = opt.lang || 'en';
+  const want = lang === 'en' ? ({games:/game/i, films:/film|movie/i, books:/novel|book|non-fiction|play by/i, albums:/album/i, tv:/television|tv series|series/i})[st.cat] : null;
+  const d = await getJSON(`https://${lang}.wikipedia.org/w/api.php?` + qs({action:'query', format:'json', origin:'*', generator:'search', gsrsearch:q, gsrlimit:'20',
     prop:'pageimages|description', piprop:'thumbnail', pithumbsize:'800', pilicense:'any'}));
   const rank = p => p.index - (want && want.test(p.description || '') ? 100 : 0);
   return Object.values(d.query?.pages || {}).sort((a,b) => rank(a) - rank(b)).filter(p => p.thumbnail).slice(0,12)
-    .map(p => ({thumb:p.thumbnail.source, full:p.thumbnail.source, title:p.title.replace(/\s\((?:\d{4}\s)?(?:video game|film|novel|album|book|game)\)$/i,''), sub:'', meta:p.description||''}));
+    .map(p => ({thumb:p.thumbnail.source, full:p.thumbnail.source, title:p.title.replace(/\s\([^)]*\)$/,''), sub:'', meta:p.description||''}));
 }
 async function editionCovers(key){
   const d = await getJSON(`https://openlibrary.org${key}/editions.json?limit=200`);
@@ -488,8 +682,19 @@ function showPanel(row, i, run){
   q.value = (it.title + ' ' + it.sub).trim();
   const sel = el('select'); sel.id = 'src' + i; sel.setAttribute('aria-label','Search source');
   Object.entries(SOURCES).forEach(([k,v]) => { const o = el('option', null, v); o.value = k; sel.appendChild(o); }); sel.value = autoSource();
+  const xsel = el('select','xsel'); xsel.id = 'x' + i; xsel.setAttribute('aria-label','Store or language');
   const go = el('button','ib srch','Search'); go.type = 'submit';
-  form.append(q, sel, go);
+  form.append(q, sel, xsel, go);
+  const syncX = () => {
+    const v = sel.value; xsel.textContent = '';
+    const opts = v === 'itunes_album' ? COUNTRIES : v === 'wikipedia' ? LANGS : null;
+    xsel.hidden = !opts;
+    if (opts) { Object.entries(opts).forEach(([k,t]) => { const o = el('option', null, t); o.value = k; xsel.appendChild(o); }); xsel.value = v === 'wikipedia' ? st.wlang : st.country; }
+    q.placeholder = v === 'url' ? 'Paste an image link (https://…)' : 'Title and author, artist, or studio';
+    if (v === 'url' && !/^https?:/i.test(q.value)) q.value = '';
+  };
+  syncX();
+  xsel.onchange = () => { if (sel.value === 'wikipedia') st.wlang = xsel.value; else st.country = xsel.value; persist(); runSearch(); };
   const stat = el('div','pstat'); const res = el('div','results');
   panel.append(form, stat, res); row.appendChild(panel);
   let token = 0;
@@ -505,7 +710,9 @@ function showPanel(row, i, run){
     stat.textContent = list.length ? label : 'No covers found. Try fewer words, add the author or artist, or switch the source.';
     list.forEach(r => {
       const b = el('button','res'); b.type = 'button'; b.title = r.edition ? 'Use this edition' : `Use ${r.title}`;
-      const im = el('img'); im.loading = 'lazy'; im.alt = ''; im.src = r.thumb; b.appendChild(im);
+      const im = el('img'); im.loading = 'lazy'; im.alt = '';
+      im.onerror = () => { if (r.alt && im.src !== r.alt) { im.src = r.alt; r.full = r.alt; } else if (r.hideBroken) b.remove(); };
+      im.src = r.thumb; b.appendChild(im);
       if (!r.edition) { b.appendChild(el('b', null, r.title)); const meta = [r.sub, r.meta].filter(Boolean).join(' · '); if (meta) b.appendChild(el('small', null, meta)); }
       if (r.key) { const m = el('span','more','Other editions'); m.setAttribute('role','button'); m.tabIndex = 0;
         const ed = async e => { e.stopPropagation(); e.preventDefault(); const my = ++token; stat.textContent = 'Loading editions…';
@@ -517,12 +724,13 @@ function showPanel(row, i, run){
   };
   const runSearch = async () => {
     const text = q.value.trim(); if (!text) { stat.textContent = 'Type a title to search.'; return; }
+    if (!xsel.hidden) { if (sel.value === 'wikipedia') st.wlang = xsel.value; else st.country = xsel.value; persist(); }
     const my = ++token; stat.textContent = `Searching ${SOURCES[sel.value]}…`; res.textContent = '';
-    try { const l = await searchCovers(sel.value, text); if (my === token) show(l, `${l.length} results from ${SOURCES[sel.value]}. Click a cover to use it.`); }
-    catch (err) { if (my === token) stat.textContent = 'Search failed (' + (err.message || 'network error') + '). Check your connection, or try another source.'; }
+    try { const l = await searchCovers(sel.value, text, {country:st.country, lang:st.wlang}); if (my === token) show(l, (l.note ? l.note + ' ' : '') + `${l.length} results from ${SOURCES[sel.value]}. Click a cover to use it.`); }
+    catch (err) { if (my === token) stat.textContent = 'Search failed: ' + (err.message || 'network error') + '. Check your connection, or try another source.'; }
   };
   form.onsubmit = e => { e.preventDefault(); runSearch(); };
-  sel.onchange = runSearch;
+  sel.onchange = () => { syncX(); if (q.value.trim()) runSearch(); else q.focus(); };
   if (run && q.value) runSearch(); else q.focus();
 }
 $('file').onchange = e => { const f = e.target.files?.[0]; if (f) setImage(pickFor, f); };
@@ -563,7 +771,7 @@ $('modal').onclick = e => { if (e.target === $('modal')) $('modal').hidden = tru
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('modal').hidden = true; });
 
 syncSettings(); buildSlots(); render();
-const faces = ['400 20px "Special Elite"','400 16px "Courier Prime"','700 16px "Courier Prime"','500 20px "Cormorant Garamond"','600 20px "Cormorant Garamond"','italic 500 20px "Cormorant Garamond"','400 14px Jost','500 14px Jost','400 16px "Josefin Sans"','700 16px "Josefin Sans"','400 20px VT323','500 14px "IBM Plex Mono"','600 14px "IBM Plex Mono"'];
+const faces = ['400 20px "Archivo Black"','400 16px Archivo','600 16px Archivo','800 16px Archivo','400 16px "Space Mono"','700 16px "Space Mono"','600 16px Fraunces','800 16px Fraunces','italic 400 16px Fraunces','500 16px "DM Sans"','700 16px "DM Sans"','400 16px Monoton','400 16px "Press Start 2P"','400 20px "Special Elite"','400 16px "Courier Prime"','700 16px "Courier Prime"','500 20px "Cormorant Garamond"','600 20px "Cormorant Garamond"','italic 500 20px "Cormorant Garamond"','400 14px Jost','500 14px Jost','400 16px "Josefin Sans"','700 16px "Josefin Sans"','400 20px VT323','500 14px "IBM Plex Mono"','600 14px "IBM Plex Mono"'];
 Promise.all(faces.map(f => document.fonts.load(f).catch(() => null))).then(schedule);
 document.fonts.ready.then(schedule);
 })();
